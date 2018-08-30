@@ -42,6 +42,6 @@ Java_com_testproject_server_MainActivity_initiateTcpConnection(JNIEnv *env, jobj
 
     char *message = const_cast<char *>("hello from android!");
     send(tcp_socket, &message, sizeof(message), 0);
-
+    close(tcp_socket);
     return (env)->NewStringUTF("TCP message sent!");
 }

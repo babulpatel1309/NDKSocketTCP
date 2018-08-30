@@ -29,16 +29,11 @@ class MainActivity : AppCompatActivity() {
         server = Server(this)
         sample_text.text = "${server.ipAddress}:${server.port}"
 
+        val encryptedString = Security.RSAEncrypt(sample_text.text.toString())
+        Log.e("Encryption", encryptedString.toString())
+        Log.e("Decryption", Security.RSADecrypt(encryptedString))
 //        sample_text.text = startServer()
-        createSocketServer()
-    }
-
-    external fun startServer(): String
-
-    companion object {
-        init {
-            System.loadLibrary("NDKServer")
-        }
+//        createSocketServer()
     }
 
     fun updateMsg(msg: String) {
@@ -54,13 +49,12 @@ class MainActivity : AppCompatActivity() {
             var socket: Socket
 
             async(UI) {
-                val result = bg {
+                bg {
                     socket = socketServer.accept()
-                    return@bg socket
+                    val commThread = CommThread(socket)
+                    Thread(commThread).start()
                 }
 
-                val commThread = CommThread(result.await())
-                Thread(commThread).start()
             }
 
         } catch (e: Exception) {

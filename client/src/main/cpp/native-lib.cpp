@@ -21,7 +21,9 @@ Java_com_testproject_client_MainActivity_stringFromJNI(
 extern "C" JNIEXPORT jstring
 
 JNICALL
-Java_com_testproject_MainActivity_initiateTcpConnection(JNIEnv *env, jobject javaThis,jstring ipAddress) {
+Java_com_testproject_MainActivity_initiateTcpConnection(JNIEnv *env, jobject javaThis,
+                                                        jstring ipAddress, jstring msg,
+                                                        jbyteArray bytes) {
     int tcp_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (tcp_socket < 0) {
         return (env)->NewStringUTF("ERROR CREATING SOCKET");
@@ -40,8 +42,10 @@ Java_com_testproject_MainActivity_initiateTcpConnection(JNIEnv *env, jobject jav
         return (env)->NewStringUTF("ERROR CONNECTING TO SERVER");
     }
 
-    char *message = const_cast<char *>("hello from android!");
-    send(tcp_socket, &message, sizeof(message), 0);
+    const char *message = env->GetStringUTFChars(msg, 0);
+//    jbyte *cData = env->GetByteArrayElements(bytes, 0);
+    send(tcp_socket, message, (int) strlen(message), 0);
+    close(tcp_socket);
 
     return (env)->NewStringUTF("TCP message sent!");
 }

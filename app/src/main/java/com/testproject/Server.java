@@ -1,6 +1,12 @@
 package com.testproject;
 
+import android.util.Log;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.InetAddress;
@@ -54,9 +60,29 @@ public class Server {
                     // Socket object
                     Socket socket = serverSocket.accept();
                     count++;
-                    message += "#" + count + " from "
+                    /*message += "#" + count + " from "
                             + socket.getInetAddress() + ":"
-                            + socket.getPort() + "\n";
+                            + socket.getPort() + "\n";*/
+
+                    InputStream inputStream = socket.getInputStream();
+                    char[] buffer = new char[inputStream.available()];
+                    BufferedReader readerNew = new BufferedReader(new InputStreamReader(inputStream));
+//                    byte[] bytes = new byte[inputStream.available()];
+                    int count = readerNew.read(buffer);
+                    if (count > 0) {
+                        //Working on it.
+                        /*try{
+                            message = Security.RSADecrypt(bytes);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }*/
+
+                        message = new String(buffer, 0, count);
+
+                    } else {
+                        message = "Error";
+                    }
+//                    message = new BufferedReader(new InputStreamReader(socket.getInputStream())).readLine();
 
                     activity.runOnUiThread(new Runnable() {
                         @Override
@@ -65,9 +91,9 @@ public class Server {
                         }
                     });
 
-                    SocketServerReplyThread socketServerReplyThread =
-                            new SocketServerReplyThread(socket, count);
-                    socketServerReplyThread.run();
+//                    SocketServerReplyThread socketServerReplyThread =
+//                            new SocketServerReplyThread(socket, count);
+//                    socketServerReplyThread.run();
 
                 }
             } catch (IOException e) {
@@ -118,7 +144,8 @@ public class Server {
 
                 @Override
                 public void run() {
-                    activity.updateMsg(message);
+
+//                    activity.updateMsg(message);
                 }
             });
         }
